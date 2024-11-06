@@ -1,12 +1,13 @@
 // components/UpdateProductForm.tsx
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Product } from '../pages/product';
+import { Product } from '../product/page';
 
 interface UpdateProductFormProps {
   product: Product;
-  onProductUpdated: (updatedProduct: Product) => void;
+  onProductUpdated: (updatedProduct: Product) => void; // Corrigido: agora aceita um Product atualizado
 }
+
 const UpdateProductForm: React.FC<UpdateProductFormProps> = ({ product, onProductUpdated }) => {
   const {
     register,
@@ -17,7 +18,7 @@ const UpdateProductForm: React.FC<UpdateProductFormProps> = ({ product, onProduc
   });
 
   const onSubmit = (data: Product) => {
-    onProductUpdated(data);
+    onProductUpdated(data); // Passa o Product atualizado para a função
   };
 
   return (

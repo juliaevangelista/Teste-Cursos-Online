@@ -1,8 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import UpdateProductForm from "../components/updateProductForm";
 import SearchAndSort from "../components/SearchAndSort";
+import UpdateProductForm from "../components/updateProductForm"; 
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth } from "../firebaseconfig";
+
 
 export interface Product {
   id: number;
@@ -22,6 +26,7 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [productsPerPage] = useState<number>(10);
   const [totalProducts, setTotalProducts] = useState<number>(0);
+  const router = useRouter();
 
   const fetchProducts = async (page: number) => {
     setLoading(true);
@@ -32,7 +37,7 @@ export default function Products() {
         }`
       );
       setProducts(response.data.products);
-      setFilteredProducts(response.data.products); // Atualiza os produtos filtrados inicialmente
+      setFilteredProducts(response.data.products); 
       setTotalProducts(response.data.total);
     } catch (err) {
       console.error("Erro ao carregar produtos", err);
@@ -46,22 +51,30 @@ export default function Products() {
     try {
       await axios.delete(`https://dummyjson.com/products/${productId}`);
       setProducts(products.filter((product) => product.id !== productId));
-      setFilteredProducts(filteredProducts.filter((product) => product.id !== productId)); // Atualiza o filteredProducts
+      setFilteredProducts(filteredProducts.filter((product) => product.id !== productId));
     } catch (err) {
       console.error("Erro ao excluir produto", err);
     }
   };
 
-  // Função para filtrar produtos por categoria
   const filterByCategory = (category: string) => {
     const filtered = products.filter((product) => product.category === category);
     setFilteredProducts(filtered);
-    setCurrentPage(1); // Reseta a página para a primeira ao filtrar
+    setCurrentPage(1); 
   };
 
   useEffect(() => {
     fetchProducts(currentPage);
   }, [currentPage]);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("Desconectado com sucesso");
+      router.push("/login");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  };
 
   if (loading) return <p>Carregando produtos...</p>;
   if (error) return <p>{error}</p>;
@@ -70,7 +83,7 @@ export default function Products() {
 
   return (
     <div className="p-4">
-      <SearchAndSort products={products} onFilter={setFilteredProducts} onCategoryFilter={filterByCategory} /> {/* Passa a função de filtro por categoria */}
+      <SearchAndSort products={products} onFilter={setFilteredProducts} onCategoryFilter={filterByCategory} /> 
       
       <div>
         {filteredProducts
@@ -80,7 +93,7 @@ export default function Products() {
           )
           .map((product) => (
             <div key={product.id}>
-              
+               {/* Exibição do produto */}
             </div>
           ))}
       </div>
@@ -123,6 +136,7 @@ export default function Products() {
           ))}
         </ul>
       </div>
+
       <div className="flex justify-between mt-4">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -144,6 +158,7 @@ export default function Products() {
           Próximo
         </button>
       </div>
+      <div className="text-center"><button className="bg-slate-400 p-2 m-2 rounded-xl" title="Logout" onClick={handleLogout}>Logout</button></div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Product } from "../pages/product";
+import { Product } from '../product/page';
 import { IoSearch } from "react-icons/io5";
 
 interface SearchAndSortProps {
